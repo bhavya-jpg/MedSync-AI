@@ -23,7 +23,7 @@ function App() {
           } 
         />
     <Route path="/addMedication" element={<MedicationEntryForm />} />
-    <Route path="*" element={<Navigate to="/addMedication"/>} />
+
     </Routes>
   )
 }
