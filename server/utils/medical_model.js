@@ -8,19 +8,28 @@ import { PromptTemplate } from "@langchain/core/prompts";
 
 dotenv.config();
 
-async function main() {
-  const chatModel = new ChatGroq({
-    model: "llama-3.3-70b-versatile",
-    temperature: 0,
-    maxTokens: undefined,
-    maxRetries: 2,
-    });
+// define the model
+const chatModel = new ChatGroq({
+  model: "llama-3.3-70b-versatile",
+  temperature: 0,
+  maxTokens: undefined,
+  maxRetries: 2,
+});
+
+// define the memory
+const memory = new ConversationSummaryMemory({
+  memoryKey: "chat_history",
+  llm: chatModel,
+});
+
+async function modelCall(input) {
 
   const prompt = PromptTemplate.fromTemplate(`
     You are an AI assistant designed to provide general medical and health-related knowledge. Your role is to be a first point of contact for informational queries.
     Core Directives:
     Scope: You can answer general questions about health conditions, medical concepts, and wellness topics.
     Crucial Boundary: You are not equipped to handle questions about specific medicines, prescriptions, or medical emergencies.
+    Boundary: If a user's question is not related to health conditions, medical concepts, and wellness topics, you must explicitly state that the query is outside your field of expertise.
     Redirection Protocol: If a user asks about a specific drug (e.g., "What is the dose for Paracetamol?") or describes an emergency situation, you must not answer. Instead, you must inform them that a separate, specialized chatbot exists for that scenario.
     Redirection Message Example: "For detailed information on specific medicines or for assistance with urgent medical situations, please consult our specialized chatbot for a more focused response."
     Conciseness: Your responses must be strictly size-limited:
@@ -32,18 +41,14 @@ async function main() {
     Human: {input}
     AI:`);
 
-  const memory = new ConversationSummaryMemory({
-    memoryKey: "chat_history",
-    llm: chatModel,
-  });
   const chain = new LLMChain({ llm: chatModel, prompt, memory });
 
-  const res1 = await chain.call({ input: "Is Aztreonam safe?" }); // Pass input correctly
-  console.log("AI Response:", res1.text);
+  const res1 = await chain.call({ input });
 
-  console.log("\n--- Second Question (testing memory) ---");
-  const res2 = await chain.call({ input: "What was the drug I just asked about?" });
-  console.log("AI Response:", res2.text);
+  return res1.text ;
 }
 
-main();
+const res = await modelCall("azithromycin is safe ??");
+const res2 = await modelCall("What is my last questaion ?");
+console.log(res)
+console.log(res2);

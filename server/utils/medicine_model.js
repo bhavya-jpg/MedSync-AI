@@ -8,13 +8,22 @@ import { PromptTemplate } from "@langchain/core/prompts";
 
 dotenv.config();
 
-async function main() {
-  const chatModel = new ChatGroq({
-    model: "llama-3.3-70b-versatile",
-    temperature: 0,
-    maxTokens: undefined,
-    maxRetries: 2,
-    });
+// define the model
+const chatModel = new ChatGroq({
+  model: "llama-3.3-70b-versatile",
+  temperature: 0,
+  maxTokens: undefined,
+  maxRetries: 2,
+});
+
+// define the memory
+const memory = new ConversationSummaryMemory({
+  memoryKey: "chat_history",
+  llm: chatModel,
+});
+
+
+async function modelCall(input) {
 
   const prompt = PromptTemplate.fromTemplate(`
     You are an intelligent AI assistant with specialized knowledge of medicines and pharmaceutical drugs. Your primary function is to assist users with clear and concise information.
@@ -31,18 +40,15 @@ async function main() {
     Human: {input}
     AI:`);
 
-  const memory = new ConversationSummaryMemory({
-    memoryKey: "chat_history",
-    llm: chatModel,
-  });
+  
   const chain = new LLMChain({ llm: chatModel, prompt, memory });
 
-  const res1 = await chain.call({ input: "Is Aztreonam safe?" }); // Pass input correctly
-  console.log("AI Response:", res1.text);
+  const res1 = await chain.call({ input });
 
-  console.log("\n--- Second Question (testing memory) ---");
-  const res2 = await chain.call({ input: "What was the drug I just asked about?" });
-  console.log("AI Response:", res2.text);
+  return res1.text ;
 }
 
-main();
+const res = await modelCall("azithromycin is safe ??");
+const res2 = await modelCall("What is my last questaion ?");
+console.log(res)
+console.log(res2);
