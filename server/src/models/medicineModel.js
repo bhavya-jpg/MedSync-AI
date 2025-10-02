@@ -23,7 +23,7 @@ const AdherenceSchema = new mongoose.Schema({
 });
 
 const MedicationSchema = new mongoose.Schema({
-  pillId: { type:String, required: false,default:"01"},  
+  userId: { type:String, required: true},  
   pillName: { type: String, required: true },
   pillDescription: { type: String },
   
