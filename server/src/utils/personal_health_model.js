@@ -32,35 +32,34 @@ const memory = new ConversationSummaryMemory({
   llm: chatModel,
 });
 
-//call the data from the database and add to the meory element
-let pastData;
-let userData;
-try{
-  userData = await Medication.find().limit(15);
-  pastData = await Conversation.find().limit(2);
-  console.log(userData);
-}catch(err){
-  console.log("Error in featching the data...")
-}
-
-// data stored in the memory
-await memory.saveContext(
-  { input: "What medications are available in the database?" },
-  { output: `Available medications:\n${userData}` }
-);
-await memory.saveContext(
-  { input: "What is the past chat?" },
-  { output: `Past Chat:\n${JSON.stringify(pastData, null, 2)}` }
-);
-
-// Verify memory content
-const memoryVariables = await memory.loadMemoryVariables({});
-console.log("Memory loaded with medication data:", memoryVariables);
-
-
 export default async function personalHealthModelHandler(req, res) {
   try {
     const input = req.body?.input || "What is my medical status ?";
+
+    //call the past two data from the database
+    let pastData = [];
+    let userData = [];
+    try {
+      userData = await Medication.find({ user: req.user.id })
+        .sort({ createdAt: -1 })
+        .limit(15);
+      pastData = await Conversation.find({ user: req.user.id })
+        .sort({ createdAt: -1 }) // latest first
+        .limit(2);
+      console.log("Past Data loaded...");
+    } catch (err) {
+      console.log("Error fetching the data...", err);
+    }
+
+    //add the userdata and pastdata in the memory 
+    await memory.saveContext(
+      { input: "What medications are available in the database?" },
+      { output: `Available medications:\n${JSON.stringify(userData, null, 1)}` }
+    );
+    await memory.saveContext(
+      { input: "What is the past chat?" },
+      { output: `Past Chat:\n${JSON.stringify(pastData, null, 2)}` }
+    );
 
     const prompt = PromptTemplate.fromTemplate(`
       You are an AI assistant specialized as a Personal Health Tracker.
