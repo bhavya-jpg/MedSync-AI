@@ -22,8 +22,18 @@ router.post("/signup", async (req, res) => {
     user = new User({ name, email, password: hashedPassword });
     await user.save();
     startNotificationScheduler(user); // Start scheduler for the new user
+    
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

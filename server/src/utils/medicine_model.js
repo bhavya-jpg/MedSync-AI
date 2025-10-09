@@ -31,32 +31,10 @@ try {
 }
 
 // define the memory
-let memory;
-if (chatModel) {
-  memory = new ConversationSummaryMemory({
-    memoryKey: "chat_history",
-    llm: chatModel,
-  });
-}
-
-//call the past memory
-let pastData
-try{
-  pastData = await Conversation.find().limit(2);
-  console.log("Past Data loaded...");
-}catch(err){
-  console.log("Error in featching the data...");
-}
-
-//add memory in the memory veriable
-if (memory) {
-  await memory.saveContext(
-    { input: "What is the past chat?" },
-    { output: `Past Chat:\n${JSON.stringify(pastData, null, 2)}` }
-  );
-}
-
-
+const memory = new ConversationSummaryMemory({
+  memoryKey: "chat_history",
+  llm: chatModel,
+});
 
 export default async function medicineModelHandler(req, res) {
   if (!chatModel) {
@@ -68,6 +46,23 @@ export default async function medicineModelHandler(req, res) {
 
   try {
     const input = req.body?.input || "What is my medical status ?";
+
+    //call the past two data from the database
+    let pastData = [];
+    try {
+      pastData = await Conversation.find({ user: req.user.id })
+        .sort({ createdAt: -1 }) // latest first
+        .limit(2);
+      console.log("Past Data loaded...");
+    } catch (err) {
+      console.log("Error fetching the data...", err);
+    }
+
+    //add the past data in the memory 
+    await memory.saveContext(
+      { input: "What is the past chat?" },
+      { output: `Past Chat:\n${JSON.stringify(pastData, null, 2)}` }
+    );
 
     const prompt = PromptTemplate.fromTemplate(`
       You are an intelligent AI assistant with specialized knowledge of medicines and pharmaceutical drugs. Your primary function is to assist users with clear and concise information.
@@ -92,7 +87,7 @@ export default async function medicineModelHandler(req, res) {
 
     // persist conversation (best-effort)
     try {
-      await Conversation.create({ summary, input, output: result.text, model: "medicine_model" });
+      await Conversation.create({ summary, input, output: result.text, model: "medicine_model", user: req.user.id});
     } catch (err) {
       console.error("Error saving conversation:", err);
     }

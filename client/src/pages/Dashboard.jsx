@@ -36,7 +36,7 @@ export default function Dashboard() {
     try {
       const data = await todayMedication();
       console.log('Fetched today\'s medications:', data);
-      setMedications(data?.data);
+      setMedications(Array.isArray(data) ? data : data?.data || []);
       console.log("medications",medications)
     } catch (error) {
       console.error('Error fetching medications:', error);
@@ -151,7 +151,7 @@ export default function Dashboard() {
               <MessageSquare className="w-5 h-5" />
               <span>AI Assistant</span>
             </button>
-            <button onClick={() => window.location.href = '/settings'} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 text-slate-400 hover:text-white transition-all">
+            <button onClick={() => window.location.href = '/health'} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 text-slate-400 hover:text-white transition-all">
               <Settings className="w-5 h-5" />
               <span>Health Profile</span>
             </button>

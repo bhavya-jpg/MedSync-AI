@@ -9,7 +9,7 @@ import MedicineRoutes from './routes/medicineRoutes.js';
 import authRoutes from "../src/routes/auth.js";
 import startNotificationScheduler from "./api/notificationController.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import healthRoutes from "./routes/health.js"
+import healthRoutes from "./routes/healthRoutes.js"
 import agentsRoutes from "./routes/agentsRoutes.js";
 import { fileURLToPath } from 'url';
 

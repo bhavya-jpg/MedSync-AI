@@ -67,6 +67,23 @@ export default async function emergencyModelHandler(req, res) {
   try {
     const input = req.body?.input || "Is this an emergency situation ?";
 
+    //call the past two data from the database
+    let pastData = [];
+    try {
+      pastData = await Conversation.find({ user: req.user.id })
+        .sort({ createdAt: -1 }) // latest first
+        .limit(2);
+      console.log("Past Data loaded...");
+    } catch (err) {
+      console.log("Error fetching the data...", err);
+    }
+
+    //add the past data in the memory 
+    await memory.saveContext(
+      { input: "What is the past chat?" },
+      { output: `Past Chat:\n${JSON.stringify(pastData, null, 2)}` }
+    );
+
     const prompt = PromptTemplate.fromTemplate(`
       You are an AI assistant specialized in Emergency Triage.
       Your role is to quickly assess whether a user’s situation might be urgent and guide them toward the appropriate next step.
@@ -99,7 +116,7 @@ export default async function emergencyModelHandler(req, res) {
     const result = await chain.call({ input });
 
     try {
-      await Conversation.create({ summary, input, output: result.text, model: "emergency_model" });
+      await Conversation.create({ summary, input, output: result.text, model: "emergency_model", user: req.user.id});
     } catch (err) {
       console.error("Error saving conversation:", err);
     }

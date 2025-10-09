@@ -61,10 +61,13 @@ export default function LandingPage() {
         alert("Signup failed: " + (data.message || "Please try again"));
         return;
       }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      console.log("Signup successful:", data.user);
       
-      alert("Account created successfully! Please login.");
-      setIsLogin(true);
-      setForm({ name: "", email: "", password: "" });
+      alert("Account created successfully! Please complete your health profile.");
+      navigate("/health");
     } catch (error) {
       alert("Signup failed: " + error.message);
     }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function HealthProfile() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -56,7 +58,7 @@ function HealthProfile() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.profile) {
@@ -184,6 +186,13 @@ function HealthProfile() {
           </div>
         </form>
       )}
+      {/* Go to Dashboard Button */}
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="w-full mt-4 bg-cyan-500 hover:bg-cyan-600 py-2 rounded-lg"
+      >
+        Go to Dashboard
+      </button>
     </div>
   );
 }

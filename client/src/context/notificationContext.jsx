@@ -8,7 +8,15 @@ export const useNotification = () => useContext(NotificationContext);
 export const NotificationProvider = ({ children }) => {
 
     const [localuser, setLocaluser] = useState(() => {
-        return JSON.parse(localStorage.getItem("user"));
+        try {
+            const stored = localStorage.getItem("user");
+            // handle cases where it's undefined, null, or "undefined"
+            if (!stored || stored === "undefined") return null;
+            return JSON.parse(stored);
+        } catch (e) {
+            console.error("Error parsing localStorage user:", e);
+            return null;
+        }
     });
 
     const [notifications, setNotifications] = useState([]);

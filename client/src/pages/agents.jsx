@@ -74,6 +74,7 @@ export default function MultiAgentChat() {
     }
   ];
 
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -104,12 +105,18 @@ export default function MultiAgentChat() {
     setLoading(true);
 
     try {
+      // Get the user data from localStorage
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
       const response = await fetch(agents[activeAgent].endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ input: userMessage.content })
+        body: JSON.stringify({ 
+          input: userMessage.content,
+          user: user // Include user data in the request body
+        })
       });
 
       const data = await response.json();
