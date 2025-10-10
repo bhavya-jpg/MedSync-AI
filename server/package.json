@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.35",
     "mongoose": "^8.19.0",
-    "node-notifier": "^10.0.1"
+    "node-notifier": "^10.0.1",
+    "socket.io": "^4.8.1"
   }
 }

@@ -21,6 +21,8 @@ export const NotificationProvider = ({ children }) => {
 
     const [notifications, setNotifications] = useState([]);
 
+
+
         // Function to call backend to trigger the scheduler (keeps existing endpoint)
         const sendNotification = useCallback(async () => {
                 if (!localuser) return; // prevent call if user not logged in
@@ -31,6 +33,9 @@ export const NotificationProvider = ({ children }) => {
                         console.error("Error in sending notification:", err?.message || err);
                 }
         }, [localuser]);
+
+
+    
 
         // Fetch today's stored notifications for the current user
         const fetchTodayNotifications = useCallback(async () => {

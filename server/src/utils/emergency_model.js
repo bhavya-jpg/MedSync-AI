@@ -17,21 +17,53 @@ if (!GROQ_API_KEY) {
 }
 
 // define the model
-const chatModel = new ChatGroq({
-  model: "llama-3.3-70b-versatile",
-  temperature: 0,
-  maxTokens: undefined,
-  maxRetries: 2,
-  apiKey: GROQ_API_KEY,
-});
+let chatModel;
+try {
+  chatModel = new ChatGroq({
+    model: "llama-3.3-70b-versatile",
+    temperature: 0,
+    maxTokens: undefined,
+    maxRetries: 2,
+    apiKey: GROQ_API_KEY,
+  });
+} catch (error) {
+  console.warn('ChatGroq initialization failed, emergency model will not be available:', error.message);
+}
 
 // define the memory
-const memory = new ConversationSummaryMemory({
-  memoryKey: "chat_history",
-  llm: chatModel,
-});
+let memory;
+if (chatModel) {
+  memory = new ConversationSummaryMemory({
+    memoryKey: "chat_history",
+    llm: chatModel,
+  });
+}
+
+//call the past memory
+let pastData;
+try{
+  pastData = await Conversation.find().limit(2);
+  console.log("Past Data loaded...");
+}catch(err){
+  console.log("Error in featching the data...");
+}
+
+//add memory in the memory veriable
+if (memory) {
+  await memory.saveContext(
+    { input: "What is the past chat?" },
+    { output: `Past Chat:\n${JSON.stringify(pastData, null, 2)}` }
+  );
+}
 
 export default async function emergencyModelHandler(req, res) {
+  if (!chatModel) {
+    return res.status(503).json({ 
+      success: false, 
+      error: "Emergency model is not available. GROQ_API_KEY may not be configured properly." 
+    });
+  }
+
   try {
     const input = req.body?.input || "Is this an emergency situation ?";
 
