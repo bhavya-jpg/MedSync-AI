@@ -11,6 +11,7 @@ import NotificationsPage from "./pages/notifications.jsx"
 import MultiAgentChat from './pages/agents.jsx';
 import HealthProfile from "./pages/HealthProfile";
 import OAuthCallback from "./pages/OAuthCallback";
+import Analytics from "./pages/Analytics";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/health" element={<HealthProfile />} />
       <Route path="/addMedication" element={<MedicationEntryForm />} />
       <Route path="/oauth2callback" element={<OAuthCallback />} />
+      <Route path="/analytics" element={<Analytics />} />
     </Routes>
     </>
   )
