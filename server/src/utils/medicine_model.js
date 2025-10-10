@@ -30,6 +30,8 @@ try {
   console.warn('ChatGroq initialization failed, medicine model will not be available:', error.message);
 }
 
+
+
 // define the memory
 const memory = new ConversationSummaryMemory({
   memoryKey: "chat_history",
