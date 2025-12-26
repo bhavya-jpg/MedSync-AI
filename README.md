@@ -350,6 +350,43 @@ Phase 5 provides React components, context, and hooks for multilingual UX on the
   - Built-in loading states and error handling
 
 ---
+
+## Multilingual Phase 6 (Report Pages Integration)
+
+Phase 6 integrates multilingual and readability features into patient-facing report pages:
+
+- **Reports Page** (`client/src/pages/Reports.jsx`):
+  - Added language selector dropdown before generating adherence report
+  - Passes selected language to backend report generation API
+  - Uses Tailwind + lucide-react for styling
+  - Report PDF generated in selected language
+
+- **ReportAnalysis Page** (`client/src/pages/ReportAnalysis.jsx`):
+  - **Language selector**: Choose report analysis language before uploading
+  - **Auto-translation**: Automatically translates analysis to selected language after upload
+  - **Readability badge**: Displays Flesch-Kincaid grade with color coding (green/yellow/red)
+  - **Translation badge**: Shows "Originally English" with toggle to view/hide translation
+  - **Original/Translated toggle**: Button to switch between original and translated text
+  - **Translation loading state**: Shows spinner while translating
+  - **Persistent readability score**: Stored and fetched from backend
+
+- **ReportChat Page** (`client/src/pages/ReportChat.jsx`):
+  - **Language selector**: Choose language for chat conversation (separate from UI language)
+  - **Auto-translate questions**: User's questions are translated to English before sending to AI
+  - **Auto-translate replies**: AI responses translated to user's selected language
+  - **Message language tag**: Shows message language in chat history
+  - **Translation loading**: "Translating question..." indicator
+  - **Graceful fallback**: If translation fails, original text is used; conversation continues
+
+- **Features**:
+  - Client-side translation via language context (caches translations)
+  - Readability scores displayed prominently with actionable suggestions
+  - Seamless language switching without page reload
+  - All UI feedback (loading, errors) integrated
+  - Responsive design for mobile and desktop
+
+---
+
 ## 🤝 How to contribute
 
 1. **Pick an issue:** Start with “good first issue” or “help wanted,” or open a discussion if unsure.
