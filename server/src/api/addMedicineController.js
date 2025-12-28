@@ -2,6 +2,7 @@ import Medication from "../models/medicineModel.js";
 
 import { addMedicineToGoogleCalendar } from "../utils/googleCalendar.js";
 import startNotificationScheduler from "./notificationController.js";
+import translationService from "../services/translationService.js";
 
 export const addMedication = async (req, res) => {
   try {
@@ -23,11 +24,38 @@ export const addMedication = async (req, res) => {
       notes
     } = medication;
 
+    // 🌐 Auto-translate pillDescription to Spanish and Hindi
+    let translatedInstructions = {};
+    if (pillDescription && pillDescription.trim().length > 0) {
+      try {
+        console.log("🌐 Translating medication instructions...");
+        const translations = await translationService.translateBatch(
+          [pillDescription, pillDescription],
+          ['es', 'hi'],
+          'medication'
+        );
+        
+        translatedInstructions = {
+          es: translations[0] || pillDescription,
+          hi: translations[1] || pillDescription
+        };
+        console.log("✅ Translated instructions:", translatedInstructions);
+      } catch (translationError) {
+        console.error("⚠️ Translation failed, storing original only:", translationError);
+        // Fallback: store original text if translation fails
+        translatedInstructions = {
+          es: pillDescription,
+          hi: pillDescription
+        };
+      }
+    }
     
     const sampleMedicine = new Medication({
       userId:localuser.id,
       pillName,
       pillDescription,
+      originalInstructions: pillDescription || '',
+      translatedInstructions,
       dosageDays,
       dosageTimes,
       dosageAmount,
@@ -43,7 +71,7 @@ export const addMedication = async (req, res) => {
     await sampleMedicine.save();
 
     // Schedule in Google Calendar
-    await addMedicineToGoogleCalendar(userId, sampleMedicine);
+    await addMedicineToGoogleCalendar(localuser.id, sampleMedicine);
     
     // ✅ Restart notification scheduler with updated medications
     console.log("🔄 Restarting notification scheduler after adding new medicine...");

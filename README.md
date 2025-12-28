@@ -387,6 +387,50 @@ Phase 6 integrates multilingual and readability features into patient-facing rep
 
 ---
 
+## Multilingual Phase 7 (Medication Instructions Translation)
+
+Phase 7 brings multilingual support to medication instructions for improved patient safety:
+
+- **Backend Auto-Translation** (`server/src/api/addMedicineController.js`):
+  - Automatically translates `pillDescription` to Spanish (es) and Hindi (hi) when medication is added
+  - Uses `translationService.translateBatch()` for efficient parallel translation
+  - Stores original English in `originalInstructions` field
+  - Stores translations in `translatedInstructions` object: `{ es: "...", hi: "..." }`
+  - Graceful fallback: If translation fails, original text stored for all languages
+  - Medical context preserved via terminology dictionary
+
+- **Dashboard Display** (`client/src/pages/Dashboard.jsx`):
+  - Displays medication instructions in user's `preferredLanguage` automatically
+  - **Language toggle button**: Switch between original English and translated version
+  - **Translation indicator**: Shows "Translated from English" badge when viewing translations
+  - **Icon badges**: Languages icon shows current language (EN/ES/HI)
+  - Per-medication toggle state (can view different languages for different medications)
+  - Seamless integration with existing medication cards
+
+- **Add Medication Preview** (`client/src/pages/addMedication.jsx`):
+  - **Live translation preview**: As user types instructions, see translations in real-time
+  - **Debounced translation**: 1-second delay prevents excessive API calls
+  - **Multi-language preview grid**: Shows Spanish and Hindi translations side-by-side
+  - **Loading indicators**: "Translating..." state during translation
+  - **Info message**: Clarifies translations are auto-saved with medication
+  - Native language names displayed (Español, हिन्दी)
+
+- **API Response** (`server/src/api/todaysMedicineController.js`):
+  - Fetches user's `preferredLanguage` from User model
+  - Returns `displayInstructions` field with appropriate translation
+  - Includes `userLanguage` field in response for frontend toggle logic
+  - Original and translations still available in response for toggle functionality
+  - Falls back to English if translation not available
+
+- **User Experience**:
+  - **Patient safety**: Instructions always available in patient's primary language
+  - **Transparency**: Easy toggle to verify original English instructions
+  - **Preview confidence**: Users see translations before saving medication
+  - **Automatic workflow**: No manual translation step required
+  - **Accessibility**: Supports non-English-speaking users and caregivers
+
+---
+
 ## 🤝 How to contribute
 
 1. **Pick an issue:** Start with “good first issue” or “help wanted,” or open a discussion if unsure.

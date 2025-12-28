@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Pill, Calendar, TrendingUp, Clock, CheckCircle, XCircle, AlertCircle,
   Flame, Sparkles, MessageSquare, Brain, Heart, Activity, FileText,
-  Settings, LogOut, Plus, ChevronRight, Bell, Menu, RefreshCw, CheckCircle2
+  Settings, LogOut, Plus, ChevronRight, Bell, Menu, RefreshCw, CheckCircle2,
+  Languages
 } from 'lucide-react';
 import { useMedicine } from '../context/medicationContext.jsx';
 import { useNotification } from '../context/notificationContext.jsx';
-
+import { useLanguage } from '../hooks/useTranslation.js';
 import { useCalendarSync } from '../context/calendarSyncContext.jsx';
 
 import Analytics from "./Analytics";
@@ -20,6 +21,8 @@ export default function Dashboard() {
   
   const { syncStatus, checkSyncStatus, syncToCalendar, connectCalendar } = useCalendarSync();
 
+  const { currentLanguage } = useLanguage();
+
   const [medications, setMedications] = useState([]);
   const [filteredMeds, setFilteredMeds] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -30,6 +33,7 @@ export default function Dashboard() {
   const [account, setAccount] = useState('');
 
   const [currentUser, setCurrentUser] = useState(null);
+  const [showOriginal, setShowOriginal] = useState({});
 
 
   useEffect(() => {
@@ -377,7 +381,14 @@ export default function Dashboard() {
                   <p className="text-slate-400">No medications to show</p>
                 </div>
               ) : (
-                (Array.isArray(filteredMeds) ? filteredMeds : []).map((med, idx) => (
+                (Array.isArray(filteredMeds) ? filteredMeds : []).map((med, idx) => {
+                  // Determine which instructions to display
+                  const isTranslated = med.userLanguage && med.userLanguage !== 'en';
+                  const displayInstructions = showOriginal[med._id] 
+                    ? (med.originalInstructions || med.pillDescription)
+                    : (med.displayInstructions || med.pillDescription);
+                  
+                  return (
                   <div key={idx} className="bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 hover:border-orange-500/50 transition-all">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-4">
@@ -397,8 +408,28 @@ export default function Dashboard() {
                       </button>
                     </div>
 
-                    {med.pillDescription && (
-                      <p className="text-slate-400 text-sm mb-4">{med.pillDescription}</p>
+                    {displayInstructions && (
+                      <div className="mb-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-slate-400 text-sm flex-1">{displayInstructions}</p>
+                          {isTranslated && (
+                            <button
+                              onClick={() => setShowOriginal(prev => ({ ...prev, [med._id]: !prev[med._id] }))}
+                              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs transition-all"
+                              title={showOriginal[med._id] ? "Show translated version" : "Show original English"}
+                            >
+                              <Languages className="w-3 h-3" />
+                              {showOriginal[med._id] ? 'EN' : currentLanguage.toUpperCase()}
+                            </button>
+                          )}
+                        </div>
+                        {isTranslated && !showOriginal[med._id] && (
+                          <p className="text-cyan-400/60 text-xs mt-1 flex items-center gap-1">
+                            <Languages className="w-3 h-3" />
+                            Translated from English
+                          </p>
+                        )}
+                      </div>
                     )}
 
                     <div className="flex flex-wrap gap-2">
@@ -411,7 +442,7 @@ export default function Dashboard() {
                       ))}
                     </div>
                   </div>
-                ))
+                )})
               )}
             </div>
 
