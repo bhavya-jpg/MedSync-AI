@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Settings, Check } from 'lucide-react';
-import { useLanguage } from '../../hooks/useTranslation';
+import { useLanguage } from '../hooks/useTranslation.js';
 import axios from 'axios';
 
   const { supportedLanguages, language: currentLanguage, setLanguage } = useLanguage();
@@ -21,7 +21,7 @@ import axios from 'axios';
   }, []);
 
   const handleLanguageChange = async (langCode) => {
-    if (langCode === language) {
+    if (langCode === currentLanguage) {
       setIsOpen(false);
       return;
     }
@@ -104,4 +104,4 @@ import axios from 'axios';
       )}
     </div>
   );
-}
+
