@@ -48,7 +48,7 @@ class TranslationService {
   /**
    * Translate multiple texts in a batch
    * @param {Array<string>} texts - Array of texts to translate
-   * @param {string} targetLang - Target language code
+   * @param {string|Array<string>} targetLang - Target language code or array of codes
    * @param {string} context - Translation context ('medical', 'general')
    * @returns {Promise<Array<string>>} - Array of translated texts
    */
@@ -57,14 +57,30 @@ class TranslationService {
       return [];
     }
 
+    // If targetLang is an array, translate each text to its corresponding language
+    if (Array.isArray(targetLang)) {
+      const results = [];
+      for (let i = 0; i < texts.length; i++) {
+        const lang = targetLang[i] || DEFAULT_LANGUAGE;
+        if (lang === DEFAULT_LANGUAGE) {
+          results.push(texts[i]);
+        } else {
+          const result = await this.translateText(texts[i], lang, context);
+          results.push(result.translatedText || texts[i]);
+        }
+      }
+      return results;
+    }
+
+    // If targetLang is a single language, translate all texts to that language
     if (targetLang === DEFAULT_LANGUAGE) {
-      return texts; // No translation needed
+      return texts;
     }
 
     const results = [];
     for (const text of texts) {
-      const translated = await this.translateText(text, targetLang, context);
-      results.push(translated);
+      const result = await this.translateText(text, targetLang, context);
+      results.push(result.translatedText || text);
     }
     return results;
   }
