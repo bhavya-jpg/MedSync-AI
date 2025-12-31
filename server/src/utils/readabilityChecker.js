@@ -378,8 +378,8 @@ class ReadabilityChecker {
     return {
       fleschKincaid: 0,
       fleschReadingEase: 0,
-      readingLevel: 'unknown',
-      readingLevelLabel: 'Unknown',
+      readingLevel: 'unknown', // standardized as key
+      readingLevelLabel: 'Unknown', // standardized as label
       grade: 0,
       isTooComplex: false,
       statistics: {
