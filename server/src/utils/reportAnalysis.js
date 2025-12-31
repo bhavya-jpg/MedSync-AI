@@ -51,7 +51,7 @@ And if the report contain any logs then analyse the logs and find the pettern an
 
 If provided report is not related to health then tell him that this is not any health report so please provide the health report and not analyse that non-health report.Do not provide unnecessary thingd like name age etc just give consise and crisp analysis like report conclusion critical conditons and suugestions according the condition. Try to consise the report in at max two peregraph so give importance to the critical observations 
 
-Make sure you analaysis crisp and consise so that user can grasp all the import things and improvements in simple and short way.
+Make sure your analysis is crisp and concise so that user can grasp all the important things and improvements in a simple and short way.
 
 Report Text:
 ${extractedText}
