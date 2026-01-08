@@ -422,27 +422,30 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="flex gap-2">
+                          </div>
+  <div className="flex gap-2">
   <button
     onClick={() => handleStatusChange(med._id, 'taken')}
-    className="px-3 py-1 bg-emerald-600 rounded text-sm"
+    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-sm transition-colors"
   >
     Taken
   </button>
 
   <button
     onClick={() => handleStatusChange(med._id, 'missed')}
-    className="px-3 py-1 bg-red-600 rounded text-sm"
+    className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition-colors"
   >
     Missed
   </button>
 
   <button
     onClick={() => handleStatusChange(med._id, 'delayed')}
-    className="px-3 py-1 bg-amber-600 rounded text-sm"
+    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 rounded text-sm transition-colors"
   >
     Delayed
   </button>
 </div>
+
 
                       </div>
 

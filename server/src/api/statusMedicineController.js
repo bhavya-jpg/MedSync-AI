@@ -27,30 +27,39 @@ export const medicineStatus = async (req, res) => {
 
     const now = new Date();
 
-    if (typeof dosageTimeIndex === 'number' && medicine.dosageTimes[dosageTimeIndex]) {
-      const dose = medicine.dosageTimes[dosageTimeIndex];
-      dose.status = status;
-      dose.takenAt = status === "taken" ? now : null;
+ if (
+  typeof dosageTimeIndex === 'number' &&
+  Number.isInteger(dosageTimeIndex) &&
+  dosageTimeIndex >= 0 &&
+  dosageTimeIndex < medicine.dosageTimes.length
+) {
+  const dose = medicine.dosageTimes[dosageTimeIndex];
 
-      medicine.adherenceHistory.push({
-        date: now,
-        time: dose.time,
-        status,
-        takenAt: status === "taken" ? now : null
-      });
-    } else {
-      medicine.dosageTimes.forEach(dt => {
-        dt.status = status;
-        dt.takenAt = status === "taken" ? now : null;
-      });
+  dose.status = status;
+  dose.takenAt = status === 'taken' ? now : null;
 
-      medicine.adherenceHistory.push({
-        date: now,
-        time: medicine.dosageTimes[0]?.time || '',
-        status,
-        takenAt: status === "taken" ? now : null
-      });
-    }
+  medicine.adherenceHistory.push({
+    date: now,
+    time: dose.time,
+    status,
+    takenAt: status === 'taken' ? now : null
+  });
+} else {
+  // Update all dosage times
+  medicine.dosageTimes.forEach((dt) => {
+    dt.status = status;
+    dt.takenAt = status === 'taken' ? now : null;
+  });
+
+  medicine.adherenceHistory.push({
+    date: now,
+    time: medicine.dosageTimes[0]?.time || '',
+    status,
+    takenAt: status === 'taken' ? now : null
+  });
+}
+
+
 
     await medicine.save();
 
@@ -61,6 +70,6 @@ export const medicineStatus = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error while updating medication status" });
   }
 };
